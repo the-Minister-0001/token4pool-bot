@@ -73,7 +73,7 @@ async def on_ready():
                ]):
                 announcements.append({'guild':guild, 'channel':channel})
                 print("Sending welcome message to", channel)
-                await channel.send("Successfully connected")
+                await channel.send("Token4Pool Bot started!")
     print()
     if old_blocks:
         newest_id_checked = max(old_blocks)
@@ -89,7 +89,7 @@ async def check_block():
             statement,
         ).first()
     newest_id = result.id
-    statement = sqlalchemy.text('''select * from pool_hash join slot_leader on slot_leader.pool_hash_id = pool_hash.id join block on block.slot_leader_id = slot_leader.id where pool_hash.view = :pool_view and block.id > :id_threshold order by block.id desc;''')
+    statement = sqlalchemy.text('''select * from pool_hash join slot_leader on slot_leader.pool_hash_id = pool_hash.id join block on block.slot_leader_id = slot_leader.id where pool_hash.view = :pool_view and block.id > :id_threshold order by block.id asc;''')
 
     with engine.connect() as con:
         results = con.execute(
@@ -113,19 +113,19 @@ async def check_block():
         winner_artist = ART_PARTNERS[art_winner_number-1]
         # RMKeyView(['stake_addr', 'amount', 'joined_epoch'])
         message_text = f':tada: CKEYS minted a new block :tada:'
-        message_text += f'\nhttps://explorer.cardano.org/en/block?id={block_hash}'
+        message_text += f'\n<https://explorer.cardano.org/en/block?id={block_hash}>'
         message_text += f'\nEpoch {epoch} at {block_time} UTC'
         message_text += f'\n\n:art: Token4Pool Art: {winner_artist}'
-        message_text += f'\n:point_right: Winner: https://pool.pm/{winner_delegator["stake_addr"]}'
+        message_text += f'\n:point_right: Winner: <https://pool.pm/{winner_delegator["stake_addr"]}>'
         message_text += f'\n\nStats:'
         message_text += f'\n\t- :clock1: Stayed with our pool since epoch {winner_delegator["joined_epoch"]}'
         message_text += f'\n\t- :moneybag: Delegated a total of {winner_delegator["amount"]/1000000:.2f}ADA in epoch {epoch}'
         message_text += f'\n\t- :four_leaf_clover: Winner number: {winner_number}'
         message_text += f'\n\t- :four_leaf_clover: Winner art number: {art_winner_number}'
         message_text += f'\n\t- :stadium: Total Delegators in Epoch {epoch}: {len(delegator_list)}'
-        message_text += f'\n\n- :notepad_spiral: List of eligible partner projects: https://pastebin.com/EEwDnvV2'
+        message_text += f'\n\n- :notepad_spiral: List of eligible partner projects: <https://pastebin.com/EEwDnvV2>'
         message_text += f'\n\n\nMade with :green_heart: by [the Minister]#0001'
-        message_text += f'\nhttps://github.com/the-Minister-0001/token4pool-bot'
+        message_text += f'\n<https://github.com/the-Minister-0001/token4pool-bot>'
         await notify_all(message_text)
         print(f"Block ID {result.id} minted in epoch {epoch} at {block_time} found")
         old_blocks.append(result.id)
